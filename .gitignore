@@ -2,7 +2,7 @@
 *.idea
 HELP.md
 *.secret
-
+application-secret.yml
 *.gradle
 
 settings.gradle
