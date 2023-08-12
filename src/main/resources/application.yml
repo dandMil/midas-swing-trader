@@ -1,0 +1,10 @@
+spring:
+  config:
+    import: classpath:application-secret.yml
+
+midas:
+  crypto-assets:
+    - X:ETHUSD
+#    - ADA
+  urls:
+    polygonUrl: /v2/aggs/ticker/
