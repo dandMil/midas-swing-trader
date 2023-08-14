@@ -1,76 +1,96 @@
 package com.dandmil.midasswingtrader.service;
 
-
+import com.dandmil.midasswingtrader.TIUtils;
+import com.dandmil.midasswingtrader.pojo.Asset;
 import com.dandmil.midasswingtrader.pojo.PolygonResponse;
-import com.dandmil.midasswingtrader.properties.MidasProperties;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import com.dandmil.midasswingtrader.pojo.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.error.Mark;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class TechnicalIndicatorService {
 
-    private final MidasProperties midasProperties;
-    private final WebClient webClient;
     private static final Logger logger = LoggerFactory.getLogger(TechnicalIndicatorService.class);
-
-   @Autowired
-    public TechnicalIndicatorService(MidasProperties midasProperties, WebClient webClient){
-       this.midasProperties = midasProperties;
-       this.webClient = webClient;
+    @Autowired
+    public TechnicalIndicatorService(){
 
     }
 
-    @Scheduled(fixedRate = 30000)
-    public void pullAssetData() {
-        List<String> cryptoAssets = midasProperties.getCryptoAssets();
-        for (String asset : cryptoAssets) {
-            fetchPolygonData(asset).subscribe( response -> {
-            logger.info("Response {}",response);
-            });
+    private double[] getClosingPrices(PolygonResponse response){
+        List<Result> resultList = response.getResults();
+        double[] resultsArray = new double[resultList.size()];
+        for (int i = 0; i < resultList.size(); i++) {
+            Result result = resultList.get(i);
+            resultsArray[i]= result.getC();
+        }
+        return resultsArray;
+    }
+    public Asset calculateTechnicalIndicators(PolygonResponse response){
+    logger.info("Calculate Technical Indicators {}",response.toString());
+
+        double[] closingList = getClosingPrices(response);
+
+        // Assume market_ta is an object containing technical analysis methods
+        double[] result = TIUtils.calculateMacd(closingList, 26, 12,6);
+        double macdLine = result[0];
+        double signalLine = result[1];
+        double macdHistogram = result[2];
+
+        Map<String, Integer> indicatorScores = new HashMap<>();
+
+        if (macdLine > signalLine) {
+            indicatorScores.put("MACD", -1);
+        } else {
+            indicatorScores.put("MACD", 1);
         }
 
+        double stochasticSignal = TIUtils.stochasticOscillator(closingList,14);
+
+        if (stochasticSignal < 20) {
+            indicatorScores.put("SO", 1);
+        }
+
+        if (stochasticSignal > 80) {
+            indicatorScores.put("SO", -1);
+        }
+
+        if (20 < stochasticSignal && 80 > stochasticSignal) {
+            indicatorScores.put("SO", 0);
+        }
+
+        double rsiSignal = TIUtils.relativeStrengthIndex(closingList,14);
+
+        if (rsiSignal > 70) {
+            indicatorScores.put("RSI", -1);
+        }
+
+        if (rsiSignal < 30) {
+            indicatorScores.put("RSI", 1);
+        }
+
+        if (30 < rsiSignal && 70 > rsiSignal) {
+            indicatorScores.put("RSI", 0);
+        }
+
+        double prc = TIUtils.priceRateOfChange(closingList,14);
+
+        if (prc > 0) {
+            indicatorScores.put("PRC", 1);
+        }
+
+        if (prc < 0) {
+            indicatorScores.put("PRC", -1);
+        }
+
+        return new Asset(response.getTicker(), closingList[0], macdLine, prc, rsiSignal, stochasticSignal, indicatorScores,""); // Define MarketAsset constructor
     }
-    private Mono<PolygonResponse> fetchPolygonData (String asset){
-        return  webClient.get()
-                .uri(buildUri(asset))
-                .retrieve()
-                .bodyToMono(PolygonResponse.class);
-   }
 
-
-    private String buildUri(String cryptoTicker){
-       StringBuilder sb = new StringBuilder();
-       sb.append("https://api.polygon.io/v2/aggs/ticker/");
-       sb.append(cryptoTicker);
-       sb.append("/");
-       sb.append("range");
-       sb.append("/");
-       sb.append("1");
-       sb.append("/");
-       sb.append("day");
-       sb.append("/");
-       sb.append(nDaysAgo(60));
-       sb.append("/");
-       sb.append(nDaysAgo(0));
-       sb.append("?");
-       sb.append("apiKey=");
-       sb.append(midasProperties.getPolygonKey());
-
-        return sb.toString();
-    }
-
-    private String nDaysAgo(int n) {
-        LocalDate today = LocalDate.now();
-        LocalDate daysAgo = today.minusDays(n);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return daysAgo.format(formatter);
-    }
 }

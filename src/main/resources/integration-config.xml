@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/integration
+       http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+    <!-- Define the Gateway -->
+    <int:gateway id="midasGateway"
+                 service-interface="com.dandmil.midasswingtrader.gateway.MidasGateway"
+                 default-request-channel="inputChannel"/>
+
+    <!-- Define a Direct Channel -->
+    <int:channel id="inputChannel"/>
+
+    <!-- Define a Chain that includes the Service Activator -->
+    <int:chain input-channel="inputChannel">
+        <int:service-activator ref="technicalIndicatorService" method="calculateTechnicalIndicators"/>
+        <int:service-activator ref="computeSignalService" method="computeSignal"/>
+    </int:chain>
+
+</beans>

@@ -4,5 +4,6 @@ HELP.md
 *.secret
 application-secret.yml
 *.gradle
-
+out
 settings.gradle
+build/tmp
