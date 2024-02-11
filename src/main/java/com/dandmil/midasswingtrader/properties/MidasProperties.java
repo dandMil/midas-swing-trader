@@ -13,4 +13,5 @@ public class MidasProperties {
     private List<String> cryptoAssets;
     private String polygonUrl;
     private String polygonKey;
+    private List<String>stockAssets;
 }

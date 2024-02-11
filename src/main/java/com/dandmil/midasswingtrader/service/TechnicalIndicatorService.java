@@ -47,9 +47,9 @@ public class TechnicalIndicatorService {
         Map<String, Integer> indicatorScores = new HashMap<>();
 
         if (macdLine > signalLine) {
-            indicatorScores.put("MACD", -1);
-        } else {
             indicatorScores.put("MACD", 1);
+        } else {
+            indicatorScores.put("MACD", -1);
         }
 
         double stochasticSignal = TIUtils.stochasticOscillator(closingList,14);

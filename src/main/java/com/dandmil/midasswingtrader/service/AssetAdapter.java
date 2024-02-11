@@ -33,7 +33,7 @@ public class AssetAdapter {
     }
 
     @Scheduled(fixedRate = 30000)
-    public void pullAssetData() {
+    public void pullAssetCryptoData() {
         List<String> cryptoAssets = midasProperties.getCryptoAssets();
         for (String asset : cryptoAssets) {
             fetchPolygonData(asset).subscribe( response -> {
@@ -42,6 +42,18 @@ public class AssetAdapter {
             });
         }
     }
+
+    @Scheduled(fixedRate = 30000)
+    public void pullAssetStockData() {
+        List<String> cryptoAssets = midasProperties.getStockAssets();
+        for (String asset : cryptoAssets) {
+            fetchPolygonData(asset).subscribe( response -> {
+                logger.info("Response {}",response);
+                midasGateway.process(response);
+            });
+        }
+    }
+
     private Mono<PolygonResponse> fetchPolygonData (String asset){
         return  webClient.get()
                 .uri(buildUri(asset))

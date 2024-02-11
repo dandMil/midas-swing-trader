@@ -6,5 +6,10 @@ midas:
   crypto-assets:
     - X:ETHUSD
 #    - ADA
+  #Replace with DB pull later
+  stock-assets:
+    - AVTX
+    - MRAI
+    - DRCT
   urls:
     polygonUrl: /v2/aggs/ticker/

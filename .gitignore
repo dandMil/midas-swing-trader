@@ -7,3 +7,5 @@ application-secret.yml
 out
 settings.gradle
 build/tmp
+build/classes
+build/
