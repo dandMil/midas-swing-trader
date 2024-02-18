@@ -5,6 +5,8 @@ import com.dandmil.midasswingtrader.gateway.MidasGateway;
 import com.dandmil.midasswingtrader.pojo.PolygonResponse;
 import com.dandmil.midasswingtrader.properties.MidasProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -32,24 +34,29 @@ public class AssetAdapter {
        this.midasGateway = midasGateway;
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 300000)
     public void pullAssetCryptoData() {
         List<String> cryptoAssets = midasProperties.getCryptoAssets();
+        String type = "Crypto";
         for (String asset : cryptoAssets) {
             fetchPolygonData(asset).subscribe( response -> {
-            logger.info("Response {}",response);
-            midasGateway.process(response);
+                Message<PolygonResponse> message = MessageBuilder.withPayload(response)
+                        .setHeader("type",type).build();
+                midasGateway.process(message);
             });
         }
     }
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 300000)
     public void pullAssetStockData() {
         List<String> cryptoAssets = midasProperties.getStockAssets();
+        String type = "Stock";
         for (String asset : cryptoAssets) {
             fetchPolygonData(asset).subscribe( response -> {
                 logger.info("Response {}",response);
-                midasGateway.process(response);
+                Message<PolygonResponse> message = MessageBuilder.withPayload(response)
+                                .setHeader("type",type).build();
+                midasGateway.process(message);
             });
         }
     }

@@ -2,6 +2,7 @@ package com.dandmil.midasswingtrader.service;
 
 import com.dandmil.midasswingtrader.Constants;
 import com.dandmil.midasswingtrader.pojo.Asset;
+import com.dandmil.midasswingtrader.repository.AssetRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,11 @@ public class ComputeSignalService {
 
     private static final Logger logger = LoggerFactory.getLogger(ComputeSignalService.class);
 
-    @Autowired
-    public ComputeSignalService(){
+    private AssetRepository assetRepository;
 
+    @Autowired
+    public ComputeSignalService(AssetRepository assetRepository){
+    this.assetRepository = assetRepository;
     }
 
     public void computeSignal(Asset asset){
@@ -49,5 +52,10 @@ public class ComputeSignalService {
             asset.setSignal(Constants.NEUTRAL);
             // Stay on the sidelines
         }
+        saveAsset(asset);
+    }
+
+    private void saveAsset(Asset asset){
+        assetRepository.save(asset);
     }
 }

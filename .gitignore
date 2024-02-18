@@ -2,6 +2,7 @@
 *.idea
 HELP.md
 *.secret
+src/main/resources/application-secret.yml
 application-secret.yml
 *.gradle
 out

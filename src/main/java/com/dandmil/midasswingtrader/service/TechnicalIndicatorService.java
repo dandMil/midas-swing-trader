@@ -7,13 +7,10 @@ import com.dandmil.midasswingtrader.pojo.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.Message;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.error.Mark;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import  java.util.UUID;
+import java.util.*;
 
 @Service
 public class TechnicalIndicatorService {
@@ -33,8 +30,10 @@ public class TechnicalIndicatorService {
         }
         return resultsArray;
     }
-    public Asset calculateTechnicalIndicators(PolygonResponse response){
-    logger.info("Calculate Technical Indicators {}",response.toString());
+    public Asset calculateTechnicalIndicators(Message<PolygonResponse> message){
+        PolygonResponse response = message.getPayload();
+        String type = message.getHeaders().get("type", String.class);
+        logger.info("Calculate Technical Indicators {}",response.toString());
 
         double[] closingList = getClosingPrices(response);
 
@@ -89,8 +88,19 @@ public class TechnicalIndicatorService {
         if (prc < 0) {
             indicatorScores.put("PRC", -1);
         }
-
-        return new Asset(response.getTicker(), closingList[0], macdLine, prc, rsiSignal, stochasticSignal, indicatorScores,""); // Define MarketAsset constructor
+        Asset asset = new Asset();
+        asset.setId(UUID.randomUUID());
+        asset.setName(response.getTicker());
+        asset.setMarketPrice(closingList[0]);
+        asset.setMacd(macdLine);
+        asset.setPriceRateOfChange(prc);
+        asset.setRelativeStrengthIndex(rsiSignal);
+        asset.setStochasticOscillator(stochasticSignal);
+        asset.setIndicatorScores(indicatorScores);
+        asset.setSignal("");
+        asset.setDate(new Date());
+        asset.setType("");
+        return asset;
     }
 
 }
