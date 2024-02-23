@@ -11,3 +11,5 @@ build/tmp
 build/classes
 build/
 *-.secret.yml
+*.csv
+.csv

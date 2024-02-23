@@ -91,7 +91,7 @@ public class TechnicalIndicatorService {
         Asset asset = new Asset();
         asset.setId(UUID.randomUUID());
         asset.setName(response.getTicker());
-        asset.setMarketPrice(closingList[0]);
+        asset.setMarketPrice(closingList[closingList.length-1]);
         asset.setMacd(macdLine);
         asset.setPriceRateOfChange(prc);
         asset.setRelativeStrengthIndex(rsiSignal);
