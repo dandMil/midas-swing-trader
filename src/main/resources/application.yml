@@ -2,9 +2,16 @@ spring:
   config:
     import: classpath:application-secret.yml
 
+  datasource:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
 midas:
   crypto-assets:
     - X:ETHUSD
+    - X:REQUSD
 #    - ADA
   #Replace with DB pull later
   stock-assets:

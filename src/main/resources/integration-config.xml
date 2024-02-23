@@ -9,16 +9,25 @@
 
     <!-- Define the Gateway -->
     <int:gateway id="midasGateway"
-                 service-interface="com.dandmil.midasswingtrader.gateway.MidasGateway"
-                 default-request-channel="inputChannel"/>
+                 service-interface="com.dandmil.midasswingtrader.gateway.MidasGateway"/>
+
 
     <!-- Define a Direct Channel -->
-    <int:channel id="inputChannel"/>
+    <int:channel id="cronChannel"/>
+    <int:channel id="getSignalChannel"/>
 
     <!-- Define a Chain that includes the Service Activator -->
-    <int:chain input-channel="inputChannel">
+    <int:chain input-channel="cronChannel">
         <int:service-activator ref="technicalIndicatorService" method="calculateTechnicalIndicators"/>
         <int:service-activator ref="computeSignalService" method="computeSignal"/>
     </int:chain>
+
+    <!-- Define a Chain that includes the Service Activator -->
+    <int:chain input-channel="getSignalChannel">
+        <int:service-activator ref="technicalIndicatorService" method="calculateTechnicalIndicators"/>
+        <int:service-activator ref="computeSignalService" method="getSignal"/>
+    </int:chain>
+
+
 
 </beans>

@@ -2,6 +2,7 @@
 *.idea
 HELP.md
 *.secret
+src/main/resources/application-secret.yml
 application-secret.yml
 *.gradle
 out
@@ -9,3 +10,6 @@ settings.gradle
 build/tmp
 build/classes
 build/
+*-.secret.yml
+*.csv
+.csv
