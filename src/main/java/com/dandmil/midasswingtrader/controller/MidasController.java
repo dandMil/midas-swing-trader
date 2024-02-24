@@ -5,8 +5,11 @@ import com.dandmil.midasswingtrader.pojo.Asset;
 import com.dandmil.midasswingtrader.repository.AssetRepository;
 import com.dandmil.midasswingtrader.service.AssetAdapter;
 import com.dandmil.midasswingtrader.service.ComputeSignalService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,11 +26,14 @@ public class MidasController {
     @Autowired
     private AssetAdapter assetAdapter;
 
-
+    private static final Logger logger = LoggerFactory.getLogger(MidasController.class);
 
 
     @GetMapping("/midas/asset/get_signal/{asset}/{type}")
+    @CrossOrigin
+
     public CompletableFuture<Asset> getSignal(@PathVariable("asset")String asset, @PathVariable("type") String type){
+        logger.info("REQUEST ASSET {} {}",asset,type);
         return assetAdapter.getAssetData(asset,type);
     }
     @GetMapping("/midas/crypto/get_all")
