@@ -10,6 +10,7 @@ public class PythonCaller {
 
 
 //    @Scheduled(fixedRate = 300000)
+    @Scheduled(cron = "0 0 * * * *") // Run every hour at the start of the hour
 
     public void findShorts() throws IOException {
         String fetching = "python3 "+"/Users/danmil0/Desktop/Projects/Python/AlgoTrading/midas/short_squeeze_finder.py";

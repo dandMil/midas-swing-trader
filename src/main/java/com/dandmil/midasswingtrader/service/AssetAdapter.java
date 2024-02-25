@@ -4,7 +4,9 @@ package com.dandmil.midasswingtrader.service;
 import com.dandmil.midasswingtrader.gateway.MidasGateway;
 import com.dandmil.midasswingtrader.pojo.Asset;
 import com.dandmil.midasswingtrader.pojo.PolygonResponse;
+import com.dandmil.midasswingtrader.pojo.WatchlistEntry;
 import com.dandmil.midasswingtrader.properties.MidasProperties;
+import com.dandmil.midasswingtrader.repository.WatchListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -28,16 +30,42 @@ public class AssetAdapter {
 
     private final MidasGateway midasGateway;
 
+    private final WatchListRepository watchListRepository;
+
     private static final Logger logger = LoggerFactory.getLogger(AssetAdapter.class);
 
    @Autowired
-    public AssetAdapter(MidasProperties midasProperties, WebClient webClient, MidasGateway midasGateway){
+    public AssetAdapter(MidasProperties midasProperties, WebClient webClient, MidasGateway midasGateway, WatchListRepository watchListRepository){
        this.midasProperties = midasProperties;
        this.webClient = webClient;
        this.midasGateway = midasGateway;
+       this.watchListRepository = watchListRepository;
     }
 
+//    @Scheduled(fixedRate = 300000)
 
+    public void checkWatchListData(){
+       List<WatchlistEntry>entries = watchListRepository.findAll();
+       StringBuilder stringBuilder = new StringBuilder();
+        for (WatchlistEntry entry: entries){
+            if(entry.getName() != null) {
+                String assetName = entry.getName().toUpperCase();
+                if (entry.getType().equals("crypto")) {
+                    stringBuilder.append("X:");
+                    stringBuilder.append(entry.getName().toUpperCase());
+                    stringBuilder.append("USD");
+                    assetName = stringBuilder.toString();
+                }
+                stringBuilder.setLength(0);
+                fetchPolygonData(assetName).subscribe(response -> {
+                    Message<PolygonResponse> message = MessageBuilder.withPayload(response)
+                            .setHeader("type", entry.getType()).build();
+                    midasGateway.process(message);
+
+                });
+            }
+       }
+    }
 
 
 //    @Scheduled(fixedRate = 300000)
