@@ -42,8 +42,7 @@ public class AssetAdapter {
        this.watchListRepository = watchListRepository;
     }
 
-//    @Scheduled(fixedRate = 300000)
-
+    @Scheduled(cron = "0 0 */12 * * *")
     public void checkWatchListData(){
        List<WatchlistEntry>entries = watchListRepository.findAll();
        StringBuilder stringBuilder = new StringBuilder();

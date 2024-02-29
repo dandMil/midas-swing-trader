@@ -9,6 +9,6 @@ import java.util.List;
 public interface AssetRepository extends JpaRepository<Asset, String> {
 
     List<Asset> findByName(String name);
-    List<Asset> findAllByNameIn(List<String> names);
+    List<Asset> findAllByNameInOrderByDateDesc(List<String> names);
 
 }

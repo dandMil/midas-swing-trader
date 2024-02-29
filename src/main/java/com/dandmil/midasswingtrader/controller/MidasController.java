@@ -39,6 +39,14 @@ public class MidasController {
     @CrossOrigin
     public CompletableFuture<Asset> getSignal(@PathVariable("asset")String asset, @PathVariable("type") String type){
         logger.info("REQUEST ASSET {} {}",asset,type);
+        if(type.equals("crypto")) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("X:");
+            stringBuilder.append(type.toUpperCase());
+            stringBuilder.append(("USD"));
+            type = stringBuilder.toString();
+            stringBuilder.setLength(0);
+        }
         return assetAdapter.getAssetData(asset,type);
     }
     @GetMapping("/midas/crypto/get_all")
@@ -82,7 +90,7 @@ public class MidasController {
                 names.add(entry.getName());
             }
 
-            List<Asset> assets = assetRepository.findAllByNameIn(names);
+            List<Asset> assets = assetRepository.findAllByNameInOrderByDateDesc(names);
 
             return assets;
         }

@@ -37,6 +37,17 @@ public class TechnicalIndicatorService {
 
         double[] closingList = getClosingPrices(response);
 
+        int left = 0;
+        int right = closingList.length - 1;
+        while (left < right) {
+            // Swap elements at left and right indices
+            double temp = closingList[left];
+            closingList[left] = closingList[right];
+            closingList[right] = temp;
+            // Move indices towards the center
+            left++;
+            right--;
+        }
         // Assume market_ta is an object containing technical analysis methods
         double[] result = TIUtils.calculateMacd(closingList, 26, 12,6);
         double macdLine = result[0];
@@ -91,7 +102,7 @@ public class TechnicalIndicatorService {
         Asset asset = new Asset();
         asset.setId(UUID.randomUUID());
         asset.setName(response.getTicker());
-        asset.setMarketPrice(closingList[closingList.length-1]);
+        asset.setMarketPrice(closingList[0]);
         asset.setMacd(macdLine);
         asset.setPriceRateOfChange(prc);
         asset.setRelativeStrengthIndex(rsiSignal);
