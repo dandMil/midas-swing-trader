@@ -10,5 +10,6 @@ public interface AssetRepository extends JpaRepository<Asset, String> {
 
     List<Asset> findByName(String name);
     List<Asset> findAllByNameInOrderByDateDesc(List<String> names);
+    boolean existsByName(String name);
 
 }

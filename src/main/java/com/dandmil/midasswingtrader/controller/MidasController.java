@@ -2,10 +2,13 @@ package com.dandmil.midasswingtrader.controller;
 
 import com.dandmil.midasswingtrader.gateway.MidasGateway;
 import com.dandmil.midasswingtrader.pojo.Asset;
+import com.dandmil.midasswingtrader.pojo.AssetResponse;
+import com.dandmil.midasswingtrader.pojo.VolumeWatchlistEntry;
 import com.dandmil.midasswingtrader.pojo.WatchlistEntry;
 import com.dandmil.midasswingtrader.repository.AssetRepository;
 import com.dandmil.midasswingtrader.repository.WatchListRepository;
 import com.dandmil.midasswingtrader.service.AssetAdapter;
+import com.dandmil.midasswingtrader.service.AssetToResponseTransformer;
 import com.dandmil.midasswingtrader.service.ComputeSignalService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,8 @@ public class MidasController {
     private AssetRepository assetRepository;
     @Autowired
     private AssetAdapter assetAdapter;
+    @Autowired
+    AssetToResponseTransformer transformer;
 
     @Autowired
     private WatchListRepository watchListRepository;
@@ -94,5 +99,20 @@ public class MidasController {
 
             return assets;
         }
+
+
+
+    @GetMapping("midas/asset/get_volume_watch_list")
+    public List<AssetResponse> getAllFromVolumeWatchList(){
+        List<AssetResponse> responses = new ArrayList<>();
+        try {
+            List<WatchlistEntry> entries = watchListRepository.findAll();
+            responses = transformer.transformAssetToResponse(entries);
+            return responses;
+        }catch (Exception e){
+            e.printStackTrace();
+            return responses;
+        }
+    }
     }
 
