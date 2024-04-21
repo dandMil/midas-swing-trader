@@ -4,7 +4,8 @@ HELP.md
 *.secret
 src/main/resources/application-secret.yml
 application-secret.yml
-*.gradle
+#*.gradle
+.gradle
 out
 settings.gradle
 build/tmp
