@@ -1,10 +1,9 @@
-package com.dandmil.midasswingtrader.pojo;
+package com.dandmil.midasswingtrader.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -27,4 +26,5 @@ public class VolumeWatchlistEntry {
     private Double dailyIncrease;
     private Double weeklyIncrease;
     private String type;
+    private Double price;
 }

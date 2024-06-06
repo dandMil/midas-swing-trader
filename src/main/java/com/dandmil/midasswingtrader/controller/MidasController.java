@@ -1,23 +1,20 @@
 package com.dandmil.midasswingtrader.controller;
 
-import com.dandmil.midasswingtrader.gateway.MidasGateway;
-import com.dandmil.midasswingtrader.pojo.Asset;
-import com.dandmil.midasswingtrader.pojo.AssetResponse;
-import com.dandmil.midasswingtrader.pojo.VolumeWatchlistEntry;
-import com.dandmil.midasswingtrader.pojo.WatchlistEntry;
+import com.dandmil.midasswingtrader.adapters.AssetAdapter;
+import com.dandmil.midasswingtrader.dto.AssetDTO;
+import com.dandmil.midasswingtrader.entity.Asset;
+import com.dandmil.midasswingtrader.entity.VolumeWatchlistEntry;
+import com.dandmil.midasswingtrader.entity.WatchlistEntry;
 import com.dandmil.midasswingtrader.repository.AssetRepository;
+import com.dandmil.midasswingtrader.repository.VolumeWatchlistRepository;
 import com.dandmil.midasswingtrader.repository.WatchListRepository;
-import com.dandmil.midasswingtrader.service.AssetAdapter;
-import com.dandmil.midasswingtrader.service.AssetToResponseTransformer;
-import com.dandmil.midasswingtrader.service.ComputeSignalService;
+import com.dandmil.midasswingtrader.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,13 +29,20 @@ public class MidasController {
     private AssetRepository assetRepository;
     @Autowired
     private AssetAdapter assetAdapter;
+
     @Autowired
-    AssetToResponseTransformer transformer;
+    AssetService assetService;
+
+    @Autowired
+    VolumeWatchlistRepository volumeWatchlistRepository;
+
+    @Autowired
+    TopMoversService topMoversService;
+
 
     @Autowired
     private WatchListRepository watchListRepository;
     private static final Logger logger = LoggerFactory.getLogger(MidasController.class);
-
 
     @GetMapping("/midas/asset/get_signal/{asset}/{type}")
     @CrossOrigin
@@ -53,6 +57,18 @@ public class MidasController {
             stringBuilder.setLength(0);
         }
         return assetAdapter.getAssetData(asset,type);
+    }
+
+    @GetMapping("/test")
+    public List<AssetDTO>getAssets(){
+        return assetService.getAllAssetsWithVolumesAndSignals();
+    }
+
+
+    @GetMapping("/midas/top-movers")
+    public CompletableFuture<ApiResponse> getTopMovers(){
+        return topMoversService.fetchTopMovers().toFuture();
+//        return null;
     }
     @GetMapping("/midas/crypto/get_all")
     public List<Asset> getAllAssets() {
@@ -88,30 +104,34 @@ public class MidasController {
 
     @GetMapping("midas/asset/get_watch_list")
         public List<Asset> getAllFromWatchList(){
+        logger.info("Called get_watch_list");
             List<WatchlistEntry> entries = watchListRepository.findAll();
             List<String>names = new ArrayList<>();
 
             for (WatchlistEntry entry: entries) {
                 names.add(entry.getName());
             }
-
-            List<Asset> assets = assetRepository.findAllByNameInOrderByDateDesc(names);
-
+            List<Asset> assets;
+//            assets = assetRepository.findAllByNameInOrderByDateCreatedDesc(names);
+            assets = assetRepository.findAll();
             return assets;
         }
 
 
 
     @GetMapping("midas/asset/get_volume_watch_list")
-    public List<AssetResponse> getAllFromVolumeWatchList(){
-        List<AssetResponse> responses = new ArrayList<>();
+    public List<VolumeWatchlistEntry> getAllFromVolumeWatchList(){
+        logger.info("Called get_volume_watch_list");
+
+        List<VolumeWatchlistEntry> entries = new ArrayList<>();
         try {
-            List<WatchlistEntry> entries = watchListRepository.findAll();
-            responses = transformer.transformAssetToResponse(entries);
-            return responses;
+//            List<WatchlistEntry> entries = watchListRepository.findAll();
+            entries = volumeWatchlistRepository.findAll();
+//            responses = transformer.transformAssetToResponse(entries);
+            return entries;
         }catch (Exception e){
             e.printStackTrace();
-            return responses;
+            return entries;
         }
     }
     }

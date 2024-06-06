@@ -1,4 +1,4 @@
-package com.dandmil.midasswingtrader.pojo;
+package com.dandmil.midasswingtrader.pojo.polygon;
 
 import lombok.Getter;
 import lombok.Setter;

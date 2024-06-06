@@ -1,11 +1,11 @@
-package com.dandmil.midasswingtrader.service;
+package com.dandmil.midasswingtrader.adapters;
 import com.google.common.util.concurrent.RateLimiter;
 
 
 import com.dandmil.midasswingtrader.gateway.MidasGateway;
-import com.dandmil.midasswingtrader.pojo.Asset;
-import com.dandmil.midasswingtrader.pojo.PolygonResponse;
-import com.dandmil.midasswingtrader.pojo.WatchlistEntry;
+import com.dandmil.midasswingtrader.entity.Asset;
+import com.dandmil.midasswingtrader.pojo.polygon.PolygonResponse;
+import com.dandmil.midasswingtrader.entity.WatchlistEntry;
 import com.dandmil.midasswingtrader.properties.MidasProperties;
 import com.dandmil.midasswingtrader.repository.WatchListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Service
 public class AssetAdapter {
@@ -57,7 +55,7 @@ public class AssetAdapter {
 
     // Assuming fetchPolygonData returns a Mono<PolygonResponse>
 
-//    @Scheduled(cron = "0 * 0 * * *") // Run once every hour at the start of the hour
+    @Scheduled(cron = "0 * 0 * * *") // Run once every hour at the start of the hour
     public void checkWatchListData() {
         logger.info("WatchList cron job has started");
         List<WatchlistEntry> entries = watchListRepository.findAll();

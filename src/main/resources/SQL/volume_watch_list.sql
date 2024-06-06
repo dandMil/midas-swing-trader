@@ -5,3 +5,12 @@ CREATE TABLE volume_watchlist  (
     date_created TIMESTAMP,
     volume INTEGER
 );
+
+
+ALTER TABLE volume_watchlist
+ADD COLUMN daily_increase DOUBLE PRECISION,
+ADD COLUMN weekly_increase DOUBLE PRECISION;
+
+
+ALTER TABLE volume_watchlist
+ADD COLUMN price DOUBLE PRECISION;
