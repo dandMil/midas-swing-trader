@@ -1,4 +1,4 @@
-package com.dandmil.midasswingtrader.pojo;
+package com.dandmil.midasswingtrader.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

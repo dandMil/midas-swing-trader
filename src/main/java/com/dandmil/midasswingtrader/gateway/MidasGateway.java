@@ -1,10 +1,9 @@
 package com.dandmil.midasswingtrader.gateway;
 
 
-import com.dandmil.midasswingtrader.pojo.Asset;
-import com.dandmil.midasswingtrader.pojo.PolygonResponse;
+import com.dandmil.midasswingtrader.entity.Asset;
+import com.dandmil.midasswingtrader.pojo.polygon.PolygonResponse;
 import org.springframework.integration.annotation.Gateway;
-import org.springframework.stereotype.Component;
 import org.springframework.messaging.Message;
 
 public interface MidasGateway {
@@ -15,4 +14,5 @@ public interface MidasGateway {
 
     @Gateway(requestChannel = "getSignalChannel")
     Asset getSignal (Message<PolygonResponse>message);
+
 }

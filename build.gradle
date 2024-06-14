@@ -1,0 +1,49 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
+}
+
+group = 'com.dandmil'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.22'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.integration:spring-integration-core:5.5.5'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.postgresql:postgresql'
+    implementation 'com.google.guava:guava:31.0.1-jre'
+
+    // Hibernate Core compatible with Jakarta EE 9
+    implementation 'org.hibernate.orm:hibernate-core:6.1.7.Final'
+
+    // MyBatis Spring Boot Starter compatible with Jakarta EE 9
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0'
+
+    // SLF4J and Logback for logging
+    implementation 'org.springframework.boot:spring-boot-starter-logging'
+
+//    implementation 'com.yahoofinance-api:YahooFinanceAPI:3.17.0' // Use the latest version
+    implementation 'com.yahoofinance-api:YahooFinanceAPI:3.17.0' // Use the latest version
+
+    // Exclude jboss-logging if necessary
+    implementation ('org.hibernate.orm:hibernate-core:6.1.7.Final') {
+        exclude group: 'org.jboss.logging', module: 'jboss-logging'
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
