@@ -35,6 +35,9 @@ dependencies {
     // SLF4J and Logback for logging
     implementation 'org.springframework.boot:spring-boot-starter-logging'
 
+//    implementation 'com.yahoofinance-api:YahooFinanceAPI:3.17.0' // Use the latest version
+    implementation 'com.yahoofinance-api:YahooFinanceAPI:3.17.0' // Use the latest version
+
     // Exclude jboss-logging if necessary
     implementation ('org.hibernate.orm:hibernate-core:6.1.7.Final') {
         exclude group: 'org.jboss.logging', module: 'jboss-logging'

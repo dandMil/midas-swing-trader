@@ -14,4 +14,5 @@ public interface MidasGateway {
 
     @Gateway(requestChannel = "getSignalChannel")
     Asset getSignal (Message<PolygonResponse>message);
+
 }

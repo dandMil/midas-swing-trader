@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -39,6 +40,9 @@ public class MidasController {
     @Autowired
     TopMoversService topMoversService;
 
+    @Autowired
+    PythonCaller pythonCaller;
+
 
     @Autowired
     private WatchListRepository watchListRepository;
@@ -59,17 +63,24 @@ public class MidasController {
         return assetAdapter.getAssetData(asset,type);
     }
 
-    @GetMapping("/test")
+    @GetMapping("/midas/asset/get_all_assets")
     public List<AssetDTO>getAssets(){
         return assetService.getAllAssetsWithVolumesAndSignals();
     }
 
 
-    @GetMapping("/midas/top-movers")
+    @GetMapping("/midas/asset/top_movers")
     public CompletableFuture<ApiResponse> getTopMovers(){
         return topMoversService.fetchTopMovers().toFuture();
-//        return null;
     }
+
+    @GetMapping("/midas/asset/significant_volume")
+    public CompletableFuture<ApiResponse>getSignificantVolume() throws IOException {
+        topMoversService.loadTopMovers();
+        return null;
+    }
+
+
     @GetMapping("/midas/crypto/get_all")
     public List<Asset> getAllAssets() {
         return assetRepository.findAll();

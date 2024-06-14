@@ -22,4 +22,16 @@ public class PolygonResponse extends ApiResponse {
     private String request_id;
     private int count;
 
+
+    public String[] getTickerArray(){
+        if (tickers == null){
+            return new String[0];
+        }
+        String [] tickerStrings = new String[tickers.length];
+        for (int i = 0; i < tickers.length; i++){
+            tickerStrings[i] = tickers[i].getTicker();
+        }
+        return tickerStrings;
+    }
+
 }

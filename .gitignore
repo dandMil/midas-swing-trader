@@ -15,3 +15,5 @@ build/
 *.csv
 .csv
 *.iml
+*.log
+.log
