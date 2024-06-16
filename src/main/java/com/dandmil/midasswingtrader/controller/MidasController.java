@@ -5,6 +5,7 @@ import com.dandmil.midasswingtrader.dto.AssetDTO;
 import com.dandmil.midasswingtrader.entity.Asset;
 import com.dandmil.midasswingtrader.entity.VolumeWatchlistEntry;
 import com.dandmil.midasswingtrader.entity.WatchlistEntry;
+import com.dandmil.midasswingtrader.pojo.AssetSignalIndicator;
 import com.dandmil.midasswingtrader.repository.AssetRepository;
 import com.dandmil.midasswingtrader.repository.VolumeWatchlistRepository;
 import com.dandmil.midasswingtrader.repository.WatchListRepository;
@@ -32,6 +33,10 @@ public class MidasController {
     private AssetAdapter assetAdapter;
 
     @Autowired
+    private TechnicalIndicatorService technicalIndicatorService;
+
+
+    @Autowired
     AssetService assetService;
 
     @Autowired
@@ -50,7 +55,7 @@ public class MidasController {
 
     @GetMapping("/midas/asset/get_signal/{asset}/{type}")
     @CrossOrigin
-    public CompletableFuture<Asset> getSignal(@PathVariable("asset")String asset, @PathVariable("type") String type){
+    public AssetSignalIndicator getSignal(@PathVariable("asset")String asset, @PathVariable("type") String type){
         logger.info("REQUEST ASSET {} {}",asset,type);
         if(type.equals("crypto")) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -60,7 +65,9 @@ public class MidasController {
             type = stringBuilder.toString();
             stringBuilder.setLength(0);
         }
-        return assetAdapter.getAssetData(asset,type);
+        AssetSignalIndicator response = technicalIndicatorService.calculateTechnicalIndicators(asset,type);
+        logger.info("Asset Signal Indicator Response {}",response.toString());
+        return technicalIndicatorService.calculateTechnicalIndicators(asset,type);
     }
 
     @GetMapping("/midas/asset/get_all_assets")

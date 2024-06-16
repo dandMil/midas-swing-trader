@@ -1,5 +1,6 @@
 package com.dandmil.midasswingtrader.service;
 
+import com.dandmil.midasswingtrader.constants.Constants;
 import com.dandmil.midasswingtrader.entity.Asset;
 import com.dandmil.midasswingtrader.repository.AssetRepository;
 import org.slf4j.Logger;
