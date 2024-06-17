@@ -6,6 +6,8 @@ import com.dandmil.midasswingtrader.entity.Asset;
 import com.dandmil.midasswingtrader.entity.VolumeWatchlistEntry;
 import com.dandmil.midasswingtrader.entity.WatchlistEntry;
 import com.dandmil.midasswingtrader.pojo.AssetSignalIndicator;
+import com.dandmil.midasswingtrader.pojo.PurchaseRequest;
+import com.dandmil.midasswingtrader.pojo.TradeRecommendation;
 import com.dandmil.midasswingtrader.repository.AssetRepository;
 import com.dandmil.midasswingtrader.repository.VolumeWatchlistRepository;
 import com.dandmil.midasswingtrader.repository.WatchListRepository;
@@ -46,6 +48,12 @@ public class MidasController {
     TopMoversService topMoversService;
 
     @Autowired
+    TradeRecommendationService tradeRecommendationService;
+
+    @Autowired
+    PortfolioService portfolioService;
+
+    @Autowired
     PythonCaller pythonCaller;
 
 
@@ -75,7 +83,21 @@ public class MidasController {
         return assetService.getAllAssetsWithVolumesAndSignals();
     }
 
+    @GetMapping("/midas/asset/get_trade_recommendation/{asset}/{entryPrice}")
+    public TradeRecommendation getTradeRecommendation(@PathVariable("asset")String ticker, @PathVariable("entryPrice")double entryPrice){
+        logger.info("Get Trade Recommendation Called for {} at {}",ticker,entryPrice);
+        return tradeRecommendationService.calculateTradeRecommendations(ticker,entryPrice);
+    }
 
+    @PostMapping("/midas/asset/purchase")
+    public ResponseEntity<String> purchaseAsset(@RequestBody PurchaseRequest purchaseRequest) {
+        // Logic to handle the purchase
+        String name = purchaseRequest.getName();
+        int shares = purchaseRequest.getShares();
+        double price = purchaseRequest.getPrice();
+        portfolioService.purchaseAssets(name,shares,price);
+        return ResponseEntity.ok("Purchase successful");
+    }
     @GetMapping("/midas/asset/top_movers")
     public CompletableFuture<ApiResponse> getTopMovers(){
         return topMoversService.fetchTopMovers().toFuture();

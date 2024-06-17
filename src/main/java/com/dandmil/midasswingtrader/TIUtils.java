@@ -1,7 +1,9 @@
 package com.dandmil.midasswingtrader;
 
 import java.util.Arrays;
+import java.util.List;
 
+import com.dandmil.midasswingtrader.pojo.polygon.Result;
 public class TIUtils {
 
     public static double priceRateOfChange(double[] price, int window) {
@@ -42,5 +44,38 @@ public class TIUtils {
                 Arrays.stream(stockPrices).skip(stockPrices.length - slidingWindow).limit(slidingWindow).average().getAsDouble();
         double macdHistogram = macdLine - signalLine;
         return new double[]{macdLine, signalLine, macdHistogram};
+    }
+
+
+    public static double calculateATR(List<Result> results, int period) {
+        if (results == null || results.size() < period) {
+            throw new IllegalArgumentException("Insufficient data to calculate ATR");
+        }
+
+        double atr = 0.0;
+
+        // Calculate True Range (TR) for each period
+        for (int i = 1; i < period; i++) {
+            Result current = results.get(i);
+            Result previous = results.get(i - 1);
+
+            double highLow = current.getH() - current.getL();
+            double highClose = Math.abs(current.getH() - previous.getC());
+            double lowClose = Math.abs(current.getL() - previous.getC());
+
+            double tr = Math.max(highLow, Math.max(highClose, lowClose));
+            atr += tr;
+        }
+
+        // Average True Range (ATR)
+        return atr / period;
+    }
+
+    public static double roundTo3SigFigs(double value) {
+        if (value == 0) {
+            return 0;
+        }
+        final double scale = Math.pow(10, 3 - Math.ceil(Math.log10(Math.abs(value))));
+        return Math.round(value * scale) / scale;
     }
 }

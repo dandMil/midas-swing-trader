@@ -17,6 +17,8 @@ import reactor.core.publisher.Mono;
 import java.util.*;
 
 import static com.dandmil.midasswingtrader.constants.Constants.FETCH_HISTORY;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Service
 public class TechnicalIndicatorService {
@@ -124,6 +126,7 @@ public class TechnicalIndicatorService {
         return asset;
     }
 
+
     public AssetSignalIndicator calculateTechnicalIndicators(String ticker, String type) {
         AssetSignalIndicator asset = new AssetSignalIndicator();
 
@@ -196,19 +199,38 @@ public class TechnicalIndicatorService {
                 indicatorScores.put("PRC", -1);
             }
 
+            double atr = TIUtils.calculateATR(((PolygonResponse) response).getResults(),14);
             logger.info("Setting Asset Indicator info");
             asset.setTicker(ticker);
             asset.setMarketPrice(closingList[0]);
-            asset.setMacd(macdLine);
-            asset.setPriceRateOfChange(prc);
-            asset.setRelativeStrengthIndex(rsiSignal);
-            asset.setStochasticOscillator(stochasticSignal);
+
+            // Convert to 2 significant figures
+            asset.setMacd(roundToSignificantFigures(macdLine, 2));
+            asset.setPriceRateOfChange(roundToSignificantFigures(prc, 2));
+            asset.setRelativeStrengthIndex(roundToSignificantFigures(rsiSignal, 2));
+            asset.setStochasticOscillator(roundToSignificantFigures(stochasticSignal, 2));
+
             asset.setIndicatorScores(indicatorScores);
             asset.setSignal(computeSignal(indicatorScores, ticker));
+            asset.setPolygonResponse((PolygonResponse) response);
+            asset.setAtr(atr);
             logger.info(asset.toString());
         }
 
         return asset;
+    }
+
+    private double roundToSignificantFigures(double num, int n) {
+        if (num == 0) {
+            return 0;
+        }
+
+        final double d = Math.ceil(Math.log10(num < 0 ? -num : num));
+        final int power = n - (int) d;
+
+        final double magnitude = Math.pow(10, power);
+        final long shifted = Math.round(num * magnitude);
+        return shifted / magnitude;
     }
 
     private String computeSignal(Map<String,Integer> signalMap,String tickerName){

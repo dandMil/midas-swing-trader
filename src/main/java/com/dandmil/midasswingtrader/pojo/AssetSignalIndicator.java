@@ -1,5 +1,6 @@
 package com.dandmil.midasswingtrader.pojo;
 
+import com.dandmil.midasswingtrader.pojo.polygon.PolygonResponse;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,8 +17,8 @@ public class AssetSignalIndicator {
     private Double priceRateOfChange;
     private Double relativeStrengthIndex;
     private Double stochasticOscillator;
+    private Double atr;
     private Map<String,Integer> indicatorScores;
-    private double blah = 8.0;
-
+    private PolygonResponse polygonResponse;
 
 }
