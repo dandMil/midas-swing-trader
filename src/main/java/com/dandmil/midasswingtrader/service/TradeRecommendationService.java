@@ -1,12 +1,15 @@
 package com.dandmil.midasswingtrader.service;
 
 import com.dandmil.midasswingtrader.TIUtils;
-import com.dandmil.midasswingtrader.adapters.PolygonAdapter;
+import com.dandmil.midasswingtrader.controller.MidasController;
+import com.dandmil.midasswingtrader.entity.TradeRecommendationEntity;
+import com.dandmil.midasswingtrader.repository.*;
 import com.dandmil.midasswingtrader.pojo.AssetSignalIndicator;
 import com.dandmil.midasswingtrader.pojo.TradeRecommendation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
 
 import java.util.Date;
 
@@ -14,6 +17,8 @@ import static com.dandmil.midasswingtrader.constants.Constants.*;
 
 @Service
 public class TradeRecommendationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(TradeRecommendationService.class);
 
     //TODO make this scale with volatility
     private static final double PROFIT_TARGET_PERCENTAGE = 10.0;
@@ -27,10 +32,12 @@ public class TradeRecommendationService {
 
     private final TechnicalIndicatorService technicalIndicatorService;
 
+    private final TradeRecommendationRepository tradeRecommendationRepository;
 
     @Autowired
-    public TradeRecommendationService( TechnicalIndicatorService technicalIndicatorService){
+    public TradeRecommendationService(TechnicalIndicatorService technicalIndicatorService, TradeRecommendationRepository tradeRecommendationRepository){
             this.technicalIndicatorService = technicalIndicatorService;
+        this.tradeRecommendationRepository = tradeRecommendationRepository;
     }
 
     public TradeRecommendation calculateTradeRecommendations(String ticker, double entryPrice) {
@@ -82,5 +89,40 @@ public class TradeRecommendationService {
         } else {
             return PERCENTAGE_BASED;
         }
+    }
+
+    public TradeRecommendation fetchTradeRecommendation(String ticker){
+        TradeRecommendationEntity tradeRecommendationEntity = tradeRecommendationRepository.findByTicker(ticker);
+        TradeRecommendation tradeRecommendation = new TradeRecommendation();
+        if (tradeRecommendationEntity !=null){
+            tradeRecommendation.setStrategy(tradeRecommendationEntity.getStrategy());
+            tradeRecommendation.setStopLoss(tradeRecommendationEntity.getStopLoss());
+            tradeRecommendation.setTakeProfit(tradeRecommendationEntity.getTakeProfit());
+            tradeRecommendation.setPriceEntry(tradeRecommendationEntity.getEntryPrice());
+            tradeRecommendation.setExpectedLoss(tradeRecommendationEntity.getExpectedLoss());
+            tradeRecommendation.setExpectedProfit(tradeRecommendationEntity.getExpectedProfit());
+            tradeRecommendation.setPriceEntry(tradeRecommendationEntity.getEntryPrice());
+        }
+
+    return tradeRecommendation;
+    }
+
+    public void saveTradeRecommendation(TradeRecommendation tradeRecommendation,String ticker,int shares){
+        TradeRecommendationEntity entity = new TradeRecommendationEntity();
+        logger.info("Saving to Trade Recommendation");
+
+            if(tradeRecommendationRepository.existsByTicker(ticker)){
+                tradeRecommendationRepository.deleteByTicker(ticker);
+            }
+            entity.setEntryPrice(tradeRecommendation.getPriceEntry());
+            entity.setExpectedProfit(tradeRecommendation.getExpectedProfit()*shares);
+            entity.setStrategy(tradeRecommendation.getStrategy());
+            entity.setExpectedLoss(tradeRecommendation.getExpectedLoss()*shares);
+            entity.setStopLoss(tradeRecommendation.getStopLoss());
+            entity.setTakeProfit(tradeRecommendation.getTakeProfit());
+            entity.setRecommendationDate(tradeRecommendation.getRecommendationDate());
+            entity.setTicker(ticker);
+            tradeRecommendationRepository.save(entity);
+
     }
 }

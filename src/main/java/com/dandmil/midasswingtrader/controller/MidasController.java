@@ -6,6 +6,7 @@ import com.dandmil.midasswingtrader.entity.Asset;
 import com.dandmil.midasswingtrader.entity.VolumeWatchlistEntry;
 import com.dandmil.midasswingtrader.entity.WatchlistEntry;
 import com.dandmil.midasswingtrader.pojo.AssetSignalIndicator;
+import com.dandmil.midasswingtrader.pojo.PortfolioEntry;
 import com.dandmil.midasswingtrader.pojo.PurchaseRequest;
 import com.dandmil.midasswingtrader.pojo.TradeRecommendation;
 import com.dandmil.midasswingtrader.repository.AssetRepository;
@@ -98,6 +99,12 @@ public class MidasController {
         portfolioService.purchaseAssets(name,shares,price);
         return ResponseEntity.ok("Purchase successful");
     }
+
+    @GetMapping("/midas/asset/get_portfolio")
+    public List<PortfolioEntry> getPortfolio(){
+       return portfolioService.fetchPortfolio();
+    }
+
     @GetMapping("/midas/asset/top_movers")
     public CompletableFuture<ApiResponse> getTopMovers(){
         return topMoversService.fetchTopMovers().toFuture();

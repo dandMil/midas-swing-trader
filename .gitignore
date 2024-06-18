@@ -17,3 +17,6 @@ build/
 *.iml
 *.log
 .log
+node_modules
+package-lock.json
+package.json
