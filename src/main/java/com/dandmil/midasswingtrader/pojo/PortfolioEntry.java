@@ -9,6 +9,7 @@ public class PortfolioEntry {
 
     private String ticker;
     private int shares;
+    private double currentPrice;
     private TradeRecommendation tradeRecommendation;
 
 
