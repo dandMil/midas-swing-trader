@@ -18,8 +18,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
 
-import static com.dandmil.midasswingtrader.constants.Constants.FETCH_HISTORY;
-import static com.dandmil.midasswingtrader.constants.Constants.FETCH_TOP_MOVERS;
+import static com.dandmil.midasswingtrader.constants.Constants.*;
 
 @Service
 public class PolygonAdapter extends Adapter {
@@ -38,11 +37,12 @@ public class PolygonAdapter extends Adapter {
     }
 
     @Override
-    public Mono<ApiResponse> makeApiCall(String assetName, String fetchCommand) {
+    public Mono<ApiResponse> makeApiCall(String assetName, String fetchCommand, int timeRange) {
         logRequest("Polygon endpoint for " + assetName);
         String endpoint = switch (fetchCommand){
             case FETCH_HISTORY -> buildPriceTickerUrl(assetName);
             case FETCH_TOP_MOVERS -> buildTopMoversUrl();
+            case FETCH_BARS -> buildBarsTickerUrl(assetName,timeRange,0);
             default -> throw new IllegalStateException("Unexpected value: " + fetchCommand);
         };
         logRequest("Using command "+fetchCommand);
@@ -86,6 +86,24 @@ public class PolygonAdapter extends Adapter {
                 .append("/")
                 .append(nDaysAgo(0))
                 .append("?apiKey=")
+                .append(midasProperties.getPolygonKey())
+                .toString();
+    }
+
+
+//    https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2023-01-09/
+//    // 2023-02-10?adjusted=true&sort=asc&apiKey=q5L0XMSpFfIyyE0q_zJWgQaZ0U8aUqMK
+
+    private String buildBarsTickerUrl(String ticker, int start, int end) {
+        return new StringBuilder()
+                .append("https://api.polygon.io/v2/aggs/ticker/")
+                .append(ticker)
+                .append("/range/1/day/")
+                .append(nDaysAgo(start))
+                .append("/")
+                .append(nDaysAgo(end))
+                .append("?adjusted=true&sort=asc&")
+                .append("apiKey=")
                 .append(midasProperties.getPolygonKey())
                 .toString();
     }

@@ -5,6 +5,7 @@ import com.dandmil.midasswingtrader.dto.AssetDTO;
 import com.dandmil.midasswingtrader.entity.Asset;
 import com.dandmil.midasswingtrader.entity.VolumeWatchlistEntry;
 import com.dandmil.midasswingtrader.entity.WatchlistEntry;
+import com.dandmil.midasswingtrader.pojo.*;
 import com.dandmil.midasswingtrader.repository.AssetRepository;
 import com.dandmil.midasswingtrader.repository.VolumeWatchlistRepository;
 import com.dandmil.midasswingtrader.repository.WatchListRepository;
@@ -24,12 +25,16 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
+
 public class MidasController {
 
     @Autowired
     private AssetRepository assetRepository;
+
     @Autowired
-    private AssetAdapter assetAdapter;
+    private TechnicalIndicatorService technicalIndicatorService;
+
 
     @Autowired
     AssetService assetService;
@@ -41,16 +46,36 @@ public class MidasController {
     TopMoversService topMoversService;
 
     @Autowired
-    PythonCaller pythonCaller;
+    TradeRecommendationService tradeRecommendationService;
+
+    @Autowired
+    PortfolioService portfolioService;
+
+    @Autowired
+    BarsService barsService;
 
 
     @Autowired
     private WatchListRepository watchListRepository;
     private static final Logger logger = LoggerFactory.getLogger(MidasController.class);
 
+
+//    @GetMapping("/midas/asset/get_bars/{asset}/{time_range}")
+//    @CrossOrigin
+//    public AssetBars getBars(@PathVariable("asset")String asset, @PathVariable("time_range")int timeRange){
+//
+//        return barsService.getBars(asset,timeRange);
+//
+//    }
+
+    @GetMapping("/midas/asset/get_bars")
+    public AssetBars getBars(@RequestParam String ticker, @RequestParam int timeRange) {
+
+        return barsService.getBars(ticker,timeRange);
+    }
+
     @GetMapping("/midas/asset/get_signal/{asset}/{type}")
-    @CrossOrigin
-    public CompletableFuture<Asset> getSignal(@PathVariable("asset")String asset, @PathVariable("type") String type){
+    public AssetSignalIndicator getSignal(@PathVariable("asset")String asset, @PathVariable("type") String type){
         logger.info("REQUEST ASSET {} {}",asset,type);
         if(type.equals("crypto")) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -60,7 +85,9 @@ public class MidasController {
             type = stringBuilder.toString();
             stringBuilder.setLength(0);
         }
-        return assetAdapter.getAssetData(asset,type);
+        AssetSignalIndicator response = technicalIndicatorService.calculateTechnicalIndicators(asset,type);
+        logger.info("Asset Signal Indicator Response {}",response.toString());
+        return technicalIndicatorService.calculateTechnicalIndicators(asset,type);
     }
 
     @GetMapping("/midas/asset/get_all_assets")
@@ -68,6 +95,26 @@ public class MidasController {
         return assetService.getAllAssetsWithVolumesAndSignals();
     }
 
+    @GetMapping("/midas/asset/get_trade_recommendation/{asset}/{entryPrice}")
+    public TradeRecommendation getTradeRecommendation(@PathVariable("asset")String ticker, @PathVariable("entryPrice")double entryPrice){
+        logger.info("Get Trade Recommendation Called for {} at {}",ticker,entryPrice);
+        return tradeRecommendationService.calculateTradeRecommendations(ticker,entryPrice);
+    }
+
+    @PostMapping("/midas/asset/purchase")
+    public ResponseEntity<String> purchaseAsset(@RequestBody PurchaseRequest purchaseRequest) {
+        // Logic to handle the purchase
+        String name = purchaseRequest.getName();
+        int shares = purchaseRequest.getShares();
+        double price = purchaseRequest.getPrice();
+        portfolioService.purchaseAssets(name,shares,price);
+        return ResponseEntity.ok("Purchase successful");
+    }
+
+    @GetMapping("/midas/asset/get_portfolio")
+    public List<PortfolioEntry> getPortfolio(){
+       return portfolioService.fetchPortfolio();
+    }
 
     @GetMapping("/midas/asset/top_movers")
     public CompletableFuture<ApiResponse> getTopMovers(){

@@ -32,12 +32,12 @@ public class TopMoversService {
     }
 
     public Mono<ApiResponse> fetchTopMovers() {
-        return polygonAdapter.makeApiCall(null, Constants.FETCH_TOP_MOVERS);
+        return polygonAdapter.makeApiCall(null, Constants.FETCH_TOP_MOVERS,0);
     }
 
     public void loadTopMovers() {
         logger.info("Loading Top Movers");
-        Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(null,Constants.FETCH_TOP_MOVERS);
+        Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(null,Constants.FETCH_TOP_MOVERS,0);
 
         apiResponseMono.cast(PolygonResponse.class)
                 .map(PolygonResponse::getTickerArray)

@@ -9,6 +9,6 @@ abstract class Adapter {
         //Log request
     }
 
-    public abstract Mono<ApiResponse> makeApiCall(String assetName, String command);
+    public abstract Mono<ApiResponse> makeApiCall(String assetName, String command, int timeRange);
 
 }
