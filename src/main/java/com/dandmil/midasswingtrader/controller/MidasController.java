@@ -5,10 +5,7 @@ import com.dandmil.midasswingtrader.dto.AssetDTO;
 import com.dandmil.midasswingtrader.entity.Asset;
 import com.dandmil.midasswingtrader.entity.VolumeWatchlistEntry;
 import com.dandmil.midasswingtrader.entity.WatchlistEntry;
-import com.dandmil.midasswingtrader.pojo.AssetSignalIndicator;
-import com.dandmil.midasswingtrader.pojo.PortfolioEntry;
-import com.dandmil.midasswingtrader.pojo.PurchaseRequest;
-import com.dandmil.midasswingtrader.pojo.TradeRecommendation;
+import com.dandmil.midasswingtrader.pojo.*;
 import com.dandmil.midasswingtrader.repository.AssetRepository;
 import com.dandmil.midasswingtrader.repository.VolumeWatchlistRepository;
 import com.dandmil.midasswingtrader.repository.WatchListRepository;
@@ -28,12 +25,12 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
+
 public class MidasController {
 
     @Autowired
     private AssetRepository assetRepository;
-    @Autowired
-    private AssetAdapter assetAdapter;
 
     @Autowired
     private TechnicalIndicatorService technicalIndicatorService;
@@ -55,15 +52,29 @@ public class MidasController {
     PortfolioService portfolioService;
 
     @Autowired
-    PythonCaller pythonCaller;
+    BarsService barsService;
 
 
     @Autowired
     private WatchListRepository watchListRepository;
     private static final Logger logger = LoggerFactory.getLogger(MidasController.class);
 
+
+//    @GetMapping("/midas/asset/get_bars/{asset}/{time_range}")
+//    @CrossOrigin
+//    public AssetBars getBars(@PathVariable("asset")String asset, @PathVariable("time_range")int timeRange){
+//
+//        return barsService.getBars(asset,timeRange);
+//
+//    }
+
+    @GetMapping("/midas/asset/get_bars")
+    public AssetBars getBars(@RequestParam String ticker, @RequestParam int timeRange) {
+
+        return barsService.getBars(ticker,timeRange);
+    }
+
     @GetMapping("/midas/asset/get_signal/{asset}/{type}")
-    @CrossOrigin
     public AssetSignalIndicator getSignal(@PathVariable("asset")String asset, @PathVariable("type") String type){
         logger.info("REQUEST ASSET {} {}",asset,type);
         if(type.equals("crypto")) {

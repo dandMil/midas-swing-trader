@@ -74,7 +74,7 @@ public class PortfolioService {
                 PortfolioEntry entry = new PortfolioEntry();
 
                 String ticker = portfolioEntity.getName();
-                Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(ticker, FETCH_HISTORY);
+                Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(ticker, FETCH_HISTORY,0);
                 PolygonResponse response = (PolygonResponse) apiResponseMono.block();
                 if (!response.getResults().isEmpty()) {
                     Result result = response.getResults().get(response.getResults().size() - 1);

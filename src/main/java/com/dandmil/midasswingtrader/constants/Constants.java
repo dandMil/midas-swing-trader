@@ -12,6 +12,7 @@ public final class Constants {
     public static final String FETCH_VOLUME = "FETCH_VOLUME";
     public static final String FETCH_TOP_MOVERS = "FETCH_TOP_MOVERS";
     public static final String FETCH_HISTORY = "FETCH_HISTORY";
+    public static final String FETCH_BARS = "FETCH_BARS";
     public static final String FETCH_ASSET_DATA = "FETCH_ASSET_DATA";
     public static final String PERCENTAGE_BASED = "PERCENTAGE_BASED";
     public static final String VOLATILITY_BASED = "VOLATILITY_BASED";
