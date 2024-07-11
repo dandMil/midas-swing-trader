@@ -235,10 +235,10 @@ public class TechnicalIndicatorService {
 
     private String computeSignal(Map<String,Integer> signalMap,String tickerName){
         Map<String, Double> indicatorWeights = new HashMap<>();
-        indicatorWeights.put("MACD", 0.5);
-        indicatorWeights.put("PRC", 0.3);
-        indicatorWeights.put("RSI", 0.2);
-        indicatorWeights.put("SO", 0.4);
+        indicatorWeights.put("MACD", 0.1);
+        indicatorWeights.put("PRC", 0.1);
+        indicatorWeights.put("RSI", 0.1);
+        indicatorWeights.put("SO", 0.1);
 
  // Compute the overall score based on the weighted sum of individual indicator scores
         double overallScore = 0;

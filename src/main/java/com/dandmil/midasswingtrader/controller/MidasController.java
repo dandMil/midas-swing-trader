@@ -71,7 +71,7 @@ public class MidasController {
     @GetMapping("/midas/asset/get_bars")
     public AssetBars getBars(@RequestParam String ticker, @RequestParam int timeRange) {
 
-        return barsService.getBars(ticker,timeRange);
+        return barsService.getBars(ticker.toUpperCase(),timeRange);
     }
 
     @GetMapping("/midas/asset/get_signal/{asset}/{type}")
@@ -85,9 +85,9 @@ public class MidasController {
             type = stringBuilder.toString();
             stringBuilder.setLength(0);
         }
-        AssetSignalIndicator response = technicalIndicatorService.calculateTechnicalIndicators(asset,type);
-        logger.info("Asset Signal Indicator Response {}",response.toString());
-        return technicalIndicatorService.calculateTechnicalIndicators(asset,type);
+//        AssetSignalIndicator response = technicalIndicatorService.calculateTechnicalIndicators(asset,type.toUpperCase());
+//        logger.info("Asset Signal Indicator Response {}",response.toString());
+        return technicalIndicatorService.calculateTechnicalIndicators(asset.toUpperCase(),type.toUpperCase());
     }
 
     @GetMapping("/midas/asset/get_all_assets")
@@ -98,7 +98,7 @@ public class MidasController {
     @GetMapping("/midas/asset/get_trade_recommendation/{asset}/{entryPrice}")
     public TradeRecommendation getTradeRecommendation(@PathVariable("asset")String ticker, @PathVariable("entryPrice")double entryPrice){
         logger.info("Get Trade Recommendation Called for {} at {}",ticker,entryPrice);
-        return tradeRecommendationService.calculateTradeRecommendations(ticker,entryPrice);
+        return tradeRecommendationService.calculateTradeRecommendations(ticker.toUpperCase(),entryPrice);
     }
 
     @PostMapping("/midas/asset/purchase")
