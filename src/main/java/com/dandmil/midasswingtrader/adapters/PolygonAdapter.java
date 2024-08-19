@@ -37,11 +37,12 @@ public class PolygonAdapter extends Adapter {
     }
 
     @Override
-    public Mono<ApiResponse> makeApiCall(String assetName, String fetchCommand, int timeRange) {
+    public Mono<ApiResponse> makeApiCall(String assetName, String fetchCommand,
+                                         int timeRange, String[] arguments) {
         logRequest("Polygon endpoint for " + assetName);
         String endpoint = switch (fetchCommand){
             case FETCH_HISTORY -> buildPriceTickerUrl(assetName);
-            case FETCH_TOP_MOVERS -> buildTopMoversUrl();
+            case FETCH_TOP_MOVERS -> buildTopMoversUrl(arguments[0]);
             case FETCH_BARS -> buildBarsTickerUrl(assetName,timeRange,0);
             default -> throw new IllegalStateException("Unexpected value: " + fetchCommand);
         };
@@ -108,8 +109,9 @@ public class PolygonAdapter extends Adapter {
                 .toString();
     }
 
-    private String buildTopMoversUrl(){
-        return "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/"+"gainers?"+"apiKey="+midasProperties.getPolygonKey();
+    private String buildTopMoversUrl(String direction){
+        logger.info("Calling Top Movers {}" ,direction);
+        return "https://api.polygon.io/v2/snapshot/locale/us/markets/stocks/"+direction+"?"+"apiKey="+midasProperties.getPolygonKey();
     }
     private String nDaysAgo(int n) {
         LocalDate today = LocalDate.now();

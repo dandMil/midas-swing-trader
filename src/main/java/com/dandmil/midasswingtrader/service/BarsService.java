@@ -27,7 +27,9 @@ public class BarsService {
     }
 
     public AssetBars getBars(String asset, int timeRange){
-        Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(asset, FETCH_HISTORY,timeRange);
+        String[] arguments = new String[2];
+        arguments[0] = "gainers";
+        Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(asset, FETCH_HISTORY,timeRange,arguments);
         PolygonResponse response = (PolygonResponse) apiResponseMono.block(); // Block and get the response
        AssetBars assetBars = new AssetBars();
         if (response != null){

@@ -20,4 +20,9 @@ public class WatchlistEntry {
     private String type;
     @Temporal(TemporalType.TIMESTAMP)
     private Date dateCreated;
+    private String movement;
+    private double price;
+    private double priceChange;
+    private double volume;
+    private double volumeChange;
 }

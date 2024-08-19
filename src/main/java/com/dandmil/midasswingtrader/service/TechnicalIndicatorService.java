@@ -129,8 +129,9 @@ public class TechnicalIndicatorService {
 
     public AssetSignalIndicator calculateTechnicalIndicators(String ticker, String type) {
         AssetSignalIndicator asset = new AssetSignalIndicator();
-
-        Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(ticker, FETCH_HISTORY,0);
+        String[] arguments = new String[2];
+        arguments[0] = "gainers";
+        Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(ticker, FETCH_HISTORY,0,arguments);
         ApiResponse response = apiResponseMono.block(); // Block and get the response
 
         if (response != null) {

@@ -68,13 +68,14 @@ public class PortfolioService {
     public List<PortfolioEntry> fetchPortfolio() {
         List<PortfolioEntity> entities = portfolioRepository.findAll();
         List<PortfolioEntry> portfolioList = new ArrayList<>();
-
+        String[] arguments = new String[2];
+        arguments[0] = "gainers";
         if (!entities.isEmpty()) {
             for (PortfolioEntity portfolioEntity : entities) {
                 PortfolioEntry entry = new PortfolioEntry();
 
                 String ticker = portfolioEntity.getName();
-                Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(ticker, FETCH_HISTORY,0);
+                Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(ticker, FETCH_HISTORY,0,arguments);
                 PolygonResponse response = (PolygonResponse) apiResponseMono.block();
                 if (!response.getResults().isEmpty()) {
                     Result result = response.getResults().get(response.getResults().size() - 1);
