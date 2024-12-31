@@ -9,6 +9,8 @@ import com.dandmil.midasswingtrader.pojo.polygon.PolygonResponse;
 import com.dandmil.midasswingtrader.pojo.polygon.Result;
 import com.dandmil.midasswingtrader.repository.PortfolioRepository;
 import org.checkerframework.checker.units.qual.A;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,9 @@ public class PortfolioService {
     private final TradeRecommendationService tradeRecommendationService;
 
     private final PolygonAdapter polygonAdapter;
+
+    private static final Logger logger = LoggerFactory.getLogger(PortfolioService.class);
+
 
     @Autowired
     public PortfolioService(PortfolioRepository portfolioRepository,
@@ -70,29 +75,38 @@ public class PortfolioService {
         List<PortfolioEntry> portfolioList = new ArrayList<>();
         String[] arguments = new String[2];
         arguments[0] = "gainers";
+
         if (!entities.isEmpty()) {
             for (PortfolioEntity portfolioEntity : entities) {
-                PortfolioEntry entry = new PortfolioEntry();
+                try {
+                    PortfolioEntry entry = new PortfolioEntry();
 
-                String ticker = portfolioEntity.getName();
-                Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(ticker, FETCH_HISTORY,0,arguments);
-                PolygonResponse response = (PolygonResponse) apiResponseMono.block();
-                if (!response.getResults().isEmpty()) {
-                    Result result = response.getResults().get(response.getResults().size() - 1);
-                    double lastPrice = result.getC();
-                    TradeRecommendation tradeRecommendation = tradeRecommendationService.fetchTradeRecommendation(ticker);
-                    entry.setShares(portfolioEntity.getShares());
-                    entry.setTicker(portfolioEntity.getName());
-                    entry.setTradeRecommendation(tradeRecommendation);
-                    entry.setCurrentPrice(lastPrice);
+                    String ticker = portfolioEntity.getName();
+                    Mono<ApiResponse> apiResponseMono = polygonAdapter.makeApiCall(ticker, FETCH_HISTORY, 0, arguments);
+                    PolygonResponse response = (PolygonResponse) apiResponseMono.block();
 
-                    portfolioList.add(entry);
+                    if (response != null && !response.getResults().isEmpty()) {
+                        Result result = response.getResults().get(response.getResults().size() - 1);
+                        double lastPrice = result.getC();
+                        TradeRecommendation tradeRecommendation = tradeRecommendationService.fetchTradeRecommendation(ticker);
+
+                        entry.setShares(portfolioEntity.getShares());
+                        entry.setTicker(portfolioEntity.getName());
+                        entry.setTradeRecommendation(tradeRecommendation);
+                        entry.setCurrentPrice(lastPrice);
+
+                        portfolioList.add(entry);
+                    }
+                } catch (Exception e) {
+                    // Log the error
+                    logger.error("Error processing portfolio entity: {}", portfolioEntity, e);
                 }
             }
         }
-            return portfolioList;
 
-        }
+        return portfolioList;
+    }
+
 
     private  double calculateDollarCostAverage(double oldPrice, double newPrice, int oldShares, int newShares) {
         // Total investment in the old shares

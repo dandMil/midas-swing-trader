@@ -85,8 +85,8 @@ public class MidasController {
             type = stringBuilder.toString();
             stringBuilder.setLength(0);
         }
-        AssetSignalIndicator response = technicalIndicatorService.calculateTechnicalIndicators(asset,type);
-        logger.info("Asset Signal Indicator Response {}",response.toString());
+//        AssetSignalIndicator response = technicalIndicatorService.calculateTechnicalIndicators(asset,type);
+//        logger.info("Asset Signal Indicator Response {}",response.toString());
         return technicalIndicatorService.calculateTechnicalIndicators(asset,type);
     }
 
@@ -111,14 +111,16 @@ public class MidasController {
         return ResponseEntity.ok("Purchase successful");
     }
 
+
+
     @GetMapping("/midas/asset/get_portfolio")
     public List<PortfolioEntry> getPortfolio(){
        return portfolioService.fetchPortfolio();
     }
 
     @GetMapping("/midas/asset/top_movers")
-    public CompletableFuture<ApiResponse> getTopMovers(){
-        return topMoversService.fetchTopMovers().toFuture();
+    public CompletableFuture<ApiResponse> getTopMovers(@RequestParam String mover){
+        return topMoversService.fetchTopMovers(mover).toFuture();
     }
 
     @GetMapping("/midas/asset/significant_volume")
@@ -192,5 +194,18 @@ public class MidasController {
             return entries;
         }
     }
+
+    @GetMapping("/midas/asset/repeated_movers")
+    public ResponseEntity<List<WatchListItem>> getRepeatedMovers() {
+        try {
+            logger.info("Fetching repeated movers...");
+            List<WatchListItem> repeatedMovers = topMoversService.findRepeatedMovers();
+            return ResponseEntity.status(HttpStatus.OK).body(repeatedMovers);
+        } catch (Exception e) {
+            logger.error("Error fetching repeated movers: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ArrayList<>());
+        }
+    }
+
     }
 

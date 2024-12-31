@@ -20,3 +20,7 @@ midas:
     - DRCT
   urls:
     polygonUrl: /v2/aggs/ticker/
+
+
+top-movers-service:
+  repeated-mover-window: 90
